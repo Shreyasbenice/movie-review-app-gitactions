@@ -1,0 +1,72 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div style="text-align: center; margin-bottom: 40px;">
+    <h1 style="font-size: 2.8rem; color: #8b2635;">Search Results</h1>
+    <p style="font-size: 1.4rem; color: #4a3426; margin-top: 15px;">
+        Showing results for: <span style="font-style: italic; color: #d4af37; font-weight: 600;">"{{ query }}"</span>
+    </p>
+    <p style="font-size: 1.2rem; color: #6b5744; margin-top: 10px;">
+        Found <span style="font-weight: 600; color: #8b2635;">{{ reviews|length }}</span> review(s)
+    </p>
+</div>
+
+<!-- Search Bar -->
+<div style="max-width: 700px; margin: 0 auto 50px auto;">
+    <form method="GET" action="{{ url_for('search') }}" style="background: transparent; border: none; padding: 0; box-shadow: none;">
+        <div style="display: flex; gap: 10px;">
+            <input type="text" 
+                   name="q" 
+                   value="{{ query }}" 
+                   placeholder="Search for movies, genres, or keywords..." 
+                   style="flex: 1; padding: 15px 20px; font-size: 1.1rem; border: 2px solid #d4af37; border-radius: 8px;"
+                   required>
+            <button type="submit" class="btn" style="margin: 0; padding: 15px 30px;">Search</button>
+        </div>
+    </form>
+</div>
+
+{% if reviews %}
+    {% for r in reviews %}
+    <div class="review-card">
+        <h2><a href="{{ url_for('view_review', review_id=r.id) }}">{{ r.title }}</a></h2>
+        <p><b>Genre:</b> {{ r.genre }}</p>
+        <p><b>Rating:</b> {{ r.rating }}/5 <span style="color: #d4af37; font-size: 1.3rem; letter-spacing: 3px;">{{ '★' * r.rating }}{{ '☆' * (5 - r.rating) }}</span></p>
+        <p style="font-style: italic; color: #4a3426; margin-top: 15px;">{{ r.content[:150] }}{% if r.content|length > 150 %}...{% endif %}</p>
+        <p style="font-size: 0.95rem; color: #6b5744; margin-top: 10px;">
+            <span style="font-style: italic;">— by <a href="{{ url_for('user_profile', user_id=r.user_id) }}" style="color: #8b2635; font-weight: 600; text-decoration: none; border-bottom: 1px solid #8b2635;">{{ r.author.username }}</a></span> • 
+            <span>{{ r.created_at.strftime('%B %d, %Y') }}</span>
+        </p>
+
+        {% if current_user and current_user.id == r.user_id %}
+            <div style="margin-top: 20px; border-top: 2px solid #ede4d3; padding-top: 15px;">
+                <a class="btn" href="{{ url_for('edit_review', review_id=r.id) }}">Edit Review</a>
+
+                <form style="display:inline" method="POST"
+                      action="{{ url_for('delete_review', review_id=r.id) }}"
+                      onsubmit="return confirm('Are you sure you want to delete this review?');">
+                    <button class="btn-danger" type="submit">Delete</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+{% else %}
+    <div style="text-align: center; padding: 80px 20px; background: rgba(255,255,255,0.6); border-radius: 10px; border: 2px dashed #8b2635; margin-top: 40px;">
+        <div style="font-size: 5rem; margin-bottom: 20px; opacity: 0.5;">🔍</div>
+        <h2 style="color: #8b2635; font-size: 2.5rem; margin-bottom: 15px;">No Matches Found</h2>
+        <p style="font-size: 1.4rem; color: #4a3426; margin-top: 20px;">
+            We couldn't find any reviews matching <span style="font-style: italic; color: #d4af37; font-weight: 600;">"{{ query }}"</span>
+        </p>
+        <p style="font-size: 1.2rem; color: #6b5744; margin-top: 15px;">
+            Try searching with different keywords or browse all reviews below.
+        </p>
+        <a class="btn" href="{{ url_for('index') }}" style="margin-top: 30px;">View All Reviews</a>
+    </div>
+{% endif %}
+
+<div style="text-align: center; margin-top: 50px;">
+    <a href="{{ url_for('index') }}">Back to All Reviews</a>
+</div>
+
+{% endblock %}

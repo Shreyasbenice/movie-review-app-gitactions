@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h1>Our Reviewers Community</h1>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; margin-top: 40px;">
+    {% for data in user_data %}
+    <div style="background: linear-gradient(135deg, #ffffff 0%, #f9f6f0 100%); border: 2px solid #d4af37; border-radius: 10px; padding: 30px; text-align: center; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); transition: all 0.4s ease;">
+        <div style="font-size: 4rem; margin-bottom: 15px;">🎭</div>
+        <h2 style="font-size: 1.8rem; color: #8b2635; margin-bottom: 10px;">
+            <a href="{{ url_for('user_profile', user_id=data.user.id) }}" style="color: #8b2635; text-decoration: none;">
+                {{ data.user.username }}
+            </a>
+        </h2>
+        <p style="font-size: 1.2rem; color: #4a3426; margin-top: 15px;">
+            <span style="font-weight: 600; color: #d4af37;">{{ data.review_count }}</span> Reviews
+        </p>
+        <a href="{{ url_for('user_profile', user_id=data.user.id) }}" class="btn" style="margin-top: 20px; display: inline-block;">View Profile</a>
+    </div>
+    {% endfor %}
+</div>
+
+<div style="text-align: center; margin-top: 40px;">
+    <a href="{{ url_for('index') }}">Back to All Reviews</a>
+</div>
+
+{% endblock %}

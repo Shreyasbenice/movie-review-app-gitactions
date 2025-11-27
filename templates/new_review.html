@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div style="max-width: 800px; margin: 0 auto;">
+    <h2 style="text-align: center; color: #8b2635; font-size: 2.8rem; margin-bottom: 40px;">
+        {{ 'Edit Your Review' if is_edit else 'Write a New Review' }}
+        <span style="display: block; font-size: 1.2rem; color: #4a3426; margin-top: 10px; font-weight: 400;">
+            {{ 'Update your thoughts on this film' if is_edit else 'Share your cinematic experience' }}
+        </span>
+    </h2>
+
+    <form method="POST">
+
+        <label>Movie Title</label>
+        <input name="title"
+               value="{% if is_edit %}{{ review.title }}{% endif %}"
+               placeholder="e.g., The Godfather"
+               required>
+
+        <label>Genre</label>
+        <input name="genre"
+               value="{% if is_edit %}{{ review.genre }}{% endif %}"
+               placeholder="e.g., Drama, Action, Comedy"
+               required>
+
+        <label>Rating (1-5 Stars)</label>
+        <select name="rating" required>
+            <option value="">Select Rating</option>
+            {% for i in range(1,6) %}
+                <option value="{{ i }}"
+                    {% if is_edit and review.rating == i %}selected{% endif %}>
+                    {{ i }} Star{{ 's' if i > 1 else '' }} {{ '★' * i }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label>Your Review</label>
+        <textarea name="content" rows="8" placeholder="Share your thoughts about the movie..." required>{% if is_edit %}{{ review.content }}{% endif %}</textarea>
+
+        <button class="btn" type="submit" style="width: 100%; padding: 18px; font-size: 1.2rem; margin-top: 20px;">
+            {% if is_edit %}Update Review{% else %}Submit Review{% endif %}
+        </button>
+
+    </form>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="{{ url_for('index') }}">Cancel and Go Back</a>
+    </div>
+</div>
+
+{% endblock %}

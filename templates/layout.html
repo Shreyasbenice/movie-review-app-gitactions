@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vintage Cinema Reviews</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="{{ url_for('index') }}">Home</a>
+    <a href="{{ url_for('users_list') }}">Reviewers</a>
+
+    {% if current_user %}
+        <a href="{{ url_for('new_review') }}">Write Review</a>
+        <span class="username">{{ current_user.username }}</span>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    {% else %}
+        <a href="{{ url_for('login') }}">Login</a>
+        <a href="{{ url_for('register') }}">Register</a>
+    {% endif %}
+</nav>
+
+<!-- Search Bar -->
+<div style="background: rgba(44, 24, 16, 0.95); padding: 30px 0; border-bottom: 2px solid #d4af37; position: relative; z-index: 99;">
+    <div style="max-width: 800px; margin: 0 auto; padding: 0 20px;">
+        <form method="GET" action="{{ url_for('search') }}" style="background: transparent; border: none; padding: 0; box-shadow: none; margin: 0;">
+            <div style="display: flex; gap: 10px;">
+                <input type="text" 
+                       name="q" 
+                       placeholder="🔍 Search for movies, genres, or keywords..." 
+                       style="flex: 1; padding: 15px 20px; font-size: 1.1rem; border: 2px solid #d4af37; border-radius: 8px; background: #f5f1e8; color: #2c1810;"
+                       required>
+                <button type="submit" class="btn" style="margin: 0; padding: 15px 30px; white-space: nowrap;">Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, msg in messages %}
+                    <div class="flash {{ category }}">{{ msg }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>

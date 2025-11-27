@@ -1,0 +1,8 @@
+Flask
+Flask-SQLAlchemy
+PyMySQL
+SQLAlchemy
+Werkzeug
+python-dotenv
+gunicorn
+cryptography

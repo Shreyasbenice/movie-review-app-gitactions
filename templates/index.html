@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>Classic Cinema Reviews</h1>
+
+{% if reviews %}
+    {% for r in reviews %}
+    <div class="review-card">
+        <h2><a href="{{ url_for('view_review', review_id=r.id) }}">{{ r.title }}</a></h2>
+        <p><b>Genre:</b> {{ r.genre }}</p>
+        <p><b>Rating:</b> {{ r.rating }}/5 <span style="color: #d4af37; font-size: 1.3rem; letter-spacing: 3px;">{{ '★' * r.rating }}{{ '☆' * (5 - r.rating) }}</span></p>
+        <p style="font-style: italic; color: #4a3426; margin-top: 15px;">{{ r.content[:150] }}{% if r.content|length > 150 %}...{% endif %}</p>
+        <p style="font-size: 0.95rem; color: #6b5744; margin-top: 10px;">
+            <span style="font-style: italic;">— by {{ r.author.username }}</span> • 
+            <span>{{ r.created_at.strftime('%B %d, %Y') }}</span>
+        </p>
+
+        {% if current_user and current_user.id == r.user_id %}
+            <div style="margin-top: 20px; border-top: 2px solid #ede4d3; padding-top: 15px;">
+                <a class="btn" href="{{ url_for('edit_review', review_id=r.id) }}">Edit Review</a>
+
+                <form style="display:inline" method="POST"
+                      action="{{ url_for('delete_review', review_id=r.id) }}"
+                      onsubmit="return confirm('Are you sure you want to delete this review?');">
+                    <button class="btn-danger" type="submit">Delete</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+{% else %}
+    <div style="text-align: center; padding: 60px 20px; background: rgba(255,255,255,0.6); border-radius: 10px; border: 2px dashed #d4af37;">
+        <h2 style="color: #8b2635; font-size: 2rem;">No Reviews Yet</h2>
+        <p style="font-size: 1.3rem; color: #4a3426; margin-top: 20px;">Be the first to share your cinematic experience!</p>
+        {% if current_user %}
+            <a class="btn" href="{{ url_for('new_review') }}" style="margin-top: 30px;">Write First Review</a>
+        {% else %}
+            <a class="btn" href="{{ url_for('login') }}" style="margin-top: 30px;">Login to Write Review</a>
+        {% endif %}
+    </div>
+{% endif %}
+
+{% endblock %}
