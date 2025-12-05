@@ -1,0 +1,51 @@
+name: Deploy to ECS
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    name: Build & Deploy to Amazon ECS
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::402996622935:role/GitHubActionsECSDeployRole
+        aws-region: us-east-1
+
+    - name: Login to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push Docker image
+      run: |
+        IMAGE_URI=402996622935.dkr.ecr.us-east-1.amazonaws.com/movie-review-app:latest
+        docker build -t movie-review-app .
+        docker tag movie-review-app:latest $IMAGE_URI
+        docker push $IMAGE_URI
+
+    - name: Render Amazon ECS task definition
+      id: render-task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ecs-task-def.json
+        container-name: movie-review-app
+        image: 402996622935.dkr.ecr.us-east-1.amazonaws.com/movie-review-app:latest
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.render-task-def.outputs.task-definition }}
+        cluster: movie-review-cluster
+        service: movie-review-task-service-hafmy9pj
+        wait-for-service-stability: true
